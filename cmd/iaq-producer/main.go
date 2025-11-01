@@ -16,7 +16,6 @@ func main() {
 
 	service := app.New(producer)
 
-	// Example payload (in real world, this comes from MQTT/HTTP)
 	data := models.SensorData{
 		DeviceID:    "sensor-1",
 		Temperature: 24.5,
