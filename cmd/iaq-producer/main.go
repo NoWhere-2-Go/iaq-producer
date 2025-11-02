@@ -11,7 +11,7 @@ import (
 
 func main() {
 	cfg := config.Load()
-	producer := kafka.NewProducer(cfg.KafkaBrokers, cfg.KafkaTopic)
+	producer := kafka.NewProducer(cfg)
 	defer producer.Close()
 
 	service := app.New(producer)

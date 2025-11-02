@@ -2,11 +2,14 @@ package kafka
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
+	"iaq-producer/internal/config"
 	"iaq-producer/internal/models"
 	"log"
 
 	"github.com/segmentio/kafka-go"
+	"github.com/segmentio/kafka-go/sasl/scram"
 )
 
 type Producer struct {
@@ -14,15 +17,25 @@ type Producer struct {
 	topic  string
 }
 
-func NewProducer(brokers, topic string) *Producer {
-	return &Producer{
-		writer: &kafka.Writer{
-			Addr:     kafka.TCP(brokers),
-			Topic:    topic,
-			Balancer: &kafka.LeastBytes{},
-		},
-		topic: topic,
+func NewProducer(config *config.Config) *Producer {
+	mechanism, err := scram.Mechanism(scram.SHA256, config.Username, config.Password)
+	if err != nil {
+		log.Fatalf("Failed to create SASL mechanism: %v", err)
 	}
+
+	temp := &Producer{
+		writer: &kafka.Writer{
+			Addr:     kafka.TCP(config.KafkaBrokers...),
+			Topic:    config.KafkaTopic,
+			Balancer: &kafka.LeastBytes{},
+			Transport: &kafka.Transport{
+				SASL: mechanism,
+				TLS:  &tls.Config{},
+			},
+		},
+		topic: config.KafkaTopic,
+	}
+	return temp
 }
 
 func (p *Producer) Send(ctx context.Context, msg models.SensorData) error {

@@ -1,21 +1,29 @@
 package config
 
-import "os"
+import (
+	"github.com/joho/godotenv"
+)
 
 type Config struct {
-	KafkaBrokers string
+	KafkaBrokers []string
 	KafkaTopic   string
 	ClientID     string
 	MQTTBroker   string
 	LogLevel     string
+	Username     string
+	Password     string
 }
 
 func Load() *Config {
+	envFile, _ := godotenv.Read(".env")
+
 	return &Config{
-		KafkaBrokers: os.Getenv("KAFKA_BROKERS"),
-		KafkaTopic:   os.Getenv("KAFKA_TOPIC"),
-		ClientID:     os.Getenv("CLIENT_ID"),
-		MQTTBroker:   os.Getenv("MQTT_BROKER"),
-		LogLevel:     os.Getenv("LOG_LEVEL"),
+		KafkaBrokers: []string{envFile["KAFKA_BROKERS"]},
+		KafkaTopic:   envFile["KAFKA_TOPIC"],
+		ClientID:     envFile["CLIENT_ID"],
+		MQTTBroker:   envFile["MQTT_BROKER"],
+		LogLevel:     envFile["LOG_LEVEL"],
+		Username:     envFile["KAFKA_USERNAME"],
+		Password:     envFile["KAFKA_PASSWORD"],
 	}
 }
