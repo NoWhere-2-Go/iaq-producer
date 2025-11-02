@@ -7,6 +7,7 @@ import (
 	"iaq-producer/internal/config"
 	"iaq-producer/internal/models"
 	"log"
+	"time"
 
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/scram"
@@ -46,6 +47,7 @@ func (p *Producer) Send(ctx context.Context, msg models.SensorData) error {
 	return p.writer.WriteMessages(ctx, kafka.Message{
 		Key:   []byte(msg.DeviceID),
 		Value: data,
+		Time:  time.Now(),
 	})
 }
 

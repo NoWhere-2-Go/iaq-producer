@@ -9,4 +9,5 @@ type SensorData struct {
 	CO2         float64   `json:"co2"`
 	VOC         float64   `json:"voc"`
 	Timestamp   time.Time `json:"timestamp"`
+	PM25        float64   `json:"pm25"`
 }
