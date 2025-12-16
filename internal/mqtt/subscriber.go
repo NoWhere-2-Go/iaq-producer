@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"log"
 
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"iaq-producer/internal/kafka"
 	"iaq-producer/internal/models"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 type Subscriber struct {
@@ -33,7 +34,7 @@ func NewSubscriber(broker, topic string, producer *kafka.Producer) *Subscriber {
 		if token := c.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
 			var data models.SensorData
 			if err := json.Unmarshal(msg.Payload(), &data); err != nil {
-				log.Printf("⚠️  Invalid JSON received on %s: %v\n", msg.Topic(), err)
+				log.Printf("Invalid JSON received on %s: %v\n", msg.Topic(), err)
 				return
 			}
 
@@ -41,12 +42,12 @@ func NewSubscriber(broker, topic string, producer *kafka.Producer) *Subscriber {
 				data.DeviceID, data.Temperature, data.Humidity)
 
 			if err := sub.producer.Send(context.Background(), data); err != nil {
-				log.Printf("❌ Kafka send failed: %v\n", err)
+				log.Printf("Kafka send failed: %v\n", err)
 			} else {
-				log.Printf("✅ Forwarded %s to Kafka\n", data.DeviceID)
+				log.Printf("Forwarded %s to Kafka\n", data.DeviceID)
 			}
 		}); token.Wait() && token.Error() != nil {
-			log.Fatalf("❌ Failed to subscribe: %v", token.Error())
+			log.Fatalf("Failed to subscribe: %v", token.Error())
 		}
 	}
 
@@ -56,7 +57,7 @@ func NewSubscriber(broker, topic string, producer *kafka.Producer) *Subscriber {
 
 func (s *Subscriber) Start() {
 	if token := s.client.Connect(); token.Wait() && token.Error() != nil {
-		log.Fatalf("❌ Failed to connect to MQTT broker: %v", token.Error())
+		log.Fatalf("Failed to connect to MQTT broker: %v", token.Error())
 	}
 	fmt.Println("MQTT subscriber running...")
 	select {}
